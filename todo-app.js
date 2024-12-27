@@ -1,18 +1,5 @@
 (function () {
-  /**
-   * Находит максимальный id в массиве дел
-   */
-  function getMaxId(array) {
-    let maxId = 0;
-    array.forEach(item => {
-      if (item.id > maxId) {
-        maxId = item.id;
-      }
-    });
-    return maxId;
-  }
-
-  /**
+    /**
    * Создает заголовок для приложения списка дел
    */
   function createAppTitle(title) {
@@ -132,44 +119,43 @@
       todoItemForm.button.disabled = !todoItemForm.input.value.trim();
     });
 
-    // Обработчик отправки формы
+    // Обработчик отправки формы (добавление нового дела)
     todoItemForm.form.addEventListener('submit', async e => {
       e.preventDefault();
 
       if (!todoItemForm.input.value) {
         return;
       }
-
+      // Запись нового дела на сервер
       const response = await fetch('http://localhost:3000/api/todos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: todoItemForm.input.value.trim(),
-          owner: 'Тимофей'
+          owner: 'Тимофей',
         })
       });
-      const newTodo = await response.json();
+      const todoItem = await response.json();
 
-
-      let todoItemElement = createTodoItem(newTodo);
+      let todoItemElement = createTodoItem(todoItem);
 
       // Обработчики кнопок для нового дела
       todoItemElement.doneButton.addEventListener('click', function () {
         todoItemElement.item.classList.toggle('list-group-item-success');
-        newTodo.done = !newTodo.done;
+        todoItem.done = !todoItem.done;
         localStorage.setItem(key, JSON.stringify(todos));
       });
 
       todoItemElement.deleteButton.addEventListener('click', function () {
         if (confirm('Вы уверены?')) {
           todoItemElement.item.remove();
-          todos = todos.filter(todo => todo.id !== newTodo.id);
+          todos = todos.filter(todo => todo.id !== todoItem.id);
           localStorage.setItem(key, JSON.stringify(todos));
         }
       });
 
       // Добавляем дело в массив и в DOM
-      todos.push(newTodo);
+      todos.push(todoItem);
       todoList.append(todoItemElement.item);
       localStorage.setItem(key, JSON.stringify(todos));
 
