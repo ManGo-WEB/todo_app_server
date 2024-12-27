@@ -133,7 +133,7 @@
     });
 
     // Обработчик отправки формы
-    todoItemForm.form.addEventListener('submit', function (e) {
+    todoItemForm.form.addEventListener('submit', e => {
       e.preventDefault();
 
       if (!todoItemForm.input.value) {
