@@ -133,31 +133,36 @@
     });
 
     // Обработчик отправки формы
-    todoItemForm.form.addEventListener('submit', e => {
+    todoItemForm.form.addEventListener('submit', async e => {
       e.preventDefault();
 
       if (!todoItemForm.input.value) {
         return;
       }
 
-      let newTodo = {
-        id: getMaxId(todos) + 1,
-        name: todoItemForm.input.value,
-        done: false
-      };
+      const response = await fetch('http://localhost:3000/api/todos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: todoItemForm.input.value.trim(),
+          owner: 'Тимофей'
+        })
+      });
+      const newTodo = await response.json();
 
-      let todoItem = createTodoItem(newTodo);
 
-      // Обработчики для нового дела
-      todoItem.doneButton.addEventListener('click', function () {
-        todoItem.item.classList.toggle('list-group-item-success');
+      let todoItemElement = createTodoItem(newTodo);
+
+      // Обработчики кнопок для нового дела
+      todoItemElement.doneButton.addEventListener('click', function () {
+        todoItemElement.item.classList.toggle('list-group-item-success');
         newTodo.done = !newTodo.done;
         localStorage.setItem(key, JSON.stringify(todos));
       });
 
-      todoItem.deleteButton.addEventListener('click', function () {
+      todoItemElement.deleteButton.addEventListener('click', function () {
         if (confirm('Вы уверены?')) {
-          todoItem.item.remove();
+          todoItemElement.item.remove();
           todos = todos.filter(todo => todo.id !== newTodo.id);
           localStorage.setItem(key, JSON.stringify(todos));
         }
@@ -165,7 +170,7 @@
 
       // Добавляем дело в массив и в DOM
       todos.push(newTodo);
-      todoList.append(todoItem.item);
+      todoList.append(todoItemElement.item);
       localStorage.setItem(key, JSON.stringify(todos));
 
       // Очищаем поле ввода и блокируем кнопку
